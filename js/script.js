@@ -22,6 +22,7 @@ let pass = document.getElementsByName('password')[0];
 let nome = document.getElementsByName('name')[0]
 let surname = document.getElementsByName('surname')[0]
 let email = document.getElementsByName('email')[0]
+let username = document.getElementsByName('username')[0]
 
 nome.addEventListener('blur', function(e) {
     if (nome.value.length < 2 || nome.value.length > 80){
@@ -59,8 +60,9 @@ pass.onblur = function(){
     pass.appendChild(inputDtNasc)
 }
 
-let formCad = document.querySelector('.form-auth')
+let formCad = document.getElementsByName('form')[0]
 formCad.onsubmit = function(e){    
+    e.preventDefault();
     nome.required = true;    
     surname.required = true;    
     email.required = true;    
@@ -75,6 +77,47 @@ formCad.onsubmit = function(e){
         pErro.innerText = "Campo nome precisa ser preenchido para realizar o cadastro"
         formCad.appendChild(divErro)    
     }
-    e.preventDefault();
+    
+    let bodyForm = {
+        "name": nome.value,
+        "surname": surname.value,
+        "username": username.value,
+        "email": email.value,
+        "password": pass.value
+    }
+    
+    //Consumo API Criaçaõ Usuario
+    let configCreate = {
+        method: 'POST',
+        body: JSON.stringify(bodyForm),
+        headers: {            
+            'Content-Type': 'application/json'
+        }
+    }
+    
+    fetch("http://localhost:8000/users/", configCreate)
+        .then(response => {
+            if (!response.ok){
+                return new Error('Consulta não realizada')
+            }
+
+            if (response.status == 404){
+                return new Error('Consulta Mal formada')
+            }
+
+            if (response.status == 201){
+                return response.json()
+            }
+        })
+        .then(resultado => {    
+            let userLogged = resultado.username
+            sessionStorage.setItem("username",JSON.stringify(userLogged))
+            window.location.href = "/feed.html"
+            
+        })
+        .catch(function(error){
+            console.log('deu ruim entrei aqui')
+            console.log(error.message)
+        })
 }
 

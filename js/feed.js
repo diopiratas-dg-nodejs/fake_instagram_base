@@ -1,4 +1,12 @@
 let seeMore = document.getElementById('more')
+window.addEventListener('load', function(){
+    if (sessionStorage.getItem('username') != null){
+        let userLogged = sessionStorage.getItem('username');
+        let divUser = document.querySelector('.avatar-content')
+        let bUserName = divUser.getElementsByTagName('b')[0]  
+        bUserName.innerText = userLogged
+    }
+})
 
 seeMore.addEventListener('click', function() {
     let divCont = document.getElementsByTagName('main')[0]
